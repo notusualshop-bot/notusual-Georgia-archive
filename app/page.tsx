@@ -1,11 +1,22 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { UGA_ARCHIVE_DATA } from "@/data";
+import { UGA_ARCHIVE_DATA, ArchiveItem } from "@/data";
 
 export default function Home() {
-  // 当前展示的文章索引
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [shuffledIndices, setShuffledIndices] = useState<number[]>([]);
+
+  // 初始化：随机打乱 102 条内容的索引池（洗牌算法）
+  useEffect(() => {
+    const indices = Array.from({ length: UGA_ARCHIVE_DATA.length }, (_, i) => i);
+    // Fisher-Yates 洗牌算法
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    setShuffledIndices(indices);
+  }, []);
 
   // 随机赛场图背景
   const stadiumImages = [
@@ -14,11 +25,27 @@ export default function Home() {
   ];
   const randomBg = stadiumImages[Math.floor(Math.random() * stadiumImages.length)];
 
-  const currentItem = UGA_ARCHIVE_DATA[currentIndex];
+  // 如果洗牌数组还没准备好，显示加载状态
+  if (shuffledIndices.length === 0) return null;
 
-  // 下一篇切换逻辑（循环）
+  // 获取当前的档案项
+  const currentActualIndex = shuffledIndices[currentIndex];
+  const currentItem: ArchiveItem = UGA_ARCHIVE_DATA[currentActualIndex];
+
+  // 点击下一篇：在洗牌池中前进；如果 102 条播完，则重新洗牌开启新一轮
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % UGA_ARCHIVE_DATA.length);
+    if (currentIndex < shuffledIndices.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      // 102条播完一轮，重新洗牌并回到开头
+      const indices = Array.from({ length: UGA_ARCHIVE_DATA.length }, (_, i) => i);
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      setShuffledIndices(indices);
+      setCurrentIndex(0);
+    }
   };
 
   return (
@@ -79,17 +106,17 @@ export default function Home() {
             {/* 压暗遮罩确保文字清晰 */}
             <div className="absolute inset-0 z-1 bg-black/15"></div>
 
-            {/* 内容区 */}
+            {/* 内容区：移除了内部 ERA 等术语，换成时间线与大局观编号 */}
             <div className="relative z-10 flex flex-col items-center text-center px-4 space-y-1">
               <p className="tracking-[0.15em] uppercase text-[10px] sm:text-xs font-bold text-stone-900 bg-white/85 px-2 py-0.5 border border-stone-900">
                 {currentItem.dateTag}
               </p>
               <p className="tracking-[0.1em] uppercase text-[10px] sm:text-[11px] font-bold text-stone-900 bg-white/85 px-2 py-0.5 border border-stone-900">
-                {currentItem.category} MODULE ({currentIndex + 1} / {UGA_ARCHIVE_DATA.length})
+                CHRONICLE ENTRY ({currentIndex + 1} / 102)
               </p>
               <div className="transform -rotate-1 mt-1">
-                <span className="block tracking-tight text-[60px] sm:text-[80px] leading-none text-[#ba0c2f] vintage-number drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)]">
-                  {currentItem.category}
+                <span className="block tracking-tight text-[50px] sm:text-[70px] leading-none text-[#ba0c2f] vintage-number drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)]">
+                  UGA 1892
                 </span>
               </div>
             </div>
@@ -105,13 +132,13 @@ export default function Home() {
               &ldquo;{currentItem.narrative}&rdquo;
             </p>
 
-            {/* 翻页按钮：完全对齐迈阿密沉浸式模式 */}
+            {/* 翻页按钮：全部采用乔治亚经典红配色 */}
             <div className="space-y-3">
               <button
                 onClick={handleNext}
-                className="w-full bg-[#0e3b2e] hover:bg-[#09271e] text-white font-serif font-bold tracking-widest text-xs uppercase py-3.5 transition-all duration-300 text-center rounded-none border border-black shadow-sm"
+                className="w-full bg-[#ba0c2f] hover:bg-[#960925] text-white font-serif font-bold tracking-widest text-xs uppercase py-3.5 transition-all duration-300 text-center rounded-none border border-black shadow-sm"
               >
-                NEXT CHAPTER IN UGA ({currentIndex + 1} / {UGA_ARCHIVE_DATA.length})
+                NEXT CHAPTER IN UGA ({currentIndex + 1} / 102)
               </button>
 
               <a
