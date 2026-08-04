@@ -30,7 +30,7 @@ export default function Home() {
   const currentActualIndex = shuffledIndices[currentIndex];
   const currentItem: ArchiveItem = UGA_ARCHIVE_DATA[currentActualIndex];
 
-  // 动态提取当前事件的 4 位年份（若找不到则默认显示 1892）
+  // 智能提取当前事件的 4 位年份（若找不到则默认显示 1892）
   const yearMatch = currentItem.dateTag.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/) || currentItem.title.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/);
   const displayYear = yearMatch ? yearMatch[0] : "1892";
 
