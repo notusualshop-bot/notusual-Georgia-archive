@@ -49,6 +49,25 @@ export default function Home() {
     }
   };
 
+  // 真实的网页分享功能（支持手机原生分享 / 复制链接）
+  const handleShare = async () => {
+    const shareData = {
+      title: currentItem.espnTitle,
+      text: currentItem.narrative,
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log("Share canceled", err);
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert("Archive link copied to clipboard!");
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#ba0c2f] text-white flex flex-col justify-between selection:bg-white selection:text-[#ba0c2f]">
       {/* 挂载自定义复古字体 AlfaSlabOne */}
@@ -107,7 +126,7 @@ export default function Home() {
             {/* 压暗遮罩确保文字清晰 */}
             <div className="absolute inset-0 z-1 bg-black/15"></div>
 
-            {/* 内容区：去掉了所有计数统计，仅保留时间线标签与动态年份 */}
+            {/* 内容区：时间线标签与动态年份 */}
             <div className="relative z-10 flex flex-col items-center text-center px-4 space-y-1">
               <p className="tracking-[0.15em] uppercase text-[10px] sm:text-xs font-bold text-stone-900 bg-white/85 px-2 py-0.5 border border-stone-900">
                 {currentItem.dateTag}
@@ -120,7 +139,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 卡片下半部分：标题、完整正文与翻页按钮 */}
+          {/* 卡片下半部分：标题、完整正文与操作按钮 */}
           <div className="p-6 sm:p-7 bg-white text-center">
             <h3 className="text-xl sm:text-2xl font-serif font-extrabold mb-3 leading-snug text-stone-950 tracking-tight">
               &ldquo;{currentItem.espnTitle}&rdquo;
@@ -130,23 +149,21 @@ export default function Home() {
               &ldquo;{currentItem.narrative}&rdquo;
             </p>
 
-            {/* 翻页按钮：去掉了数字后缀 */}
+            {/* 操作按钮区 */}
             <div className="space-y-3">
               <button
                 onClick={handleNext}
-                className="w-full bg-[#ba0c2f] hover:bg-[#960925] text-white font-serif font-bold tracking-widest text-xs uppercase py-3.5 transition-all duration-300 text-center rounded-none border border-black shadow-sm"
+                className="w-full bg-[#ba0c2f] hover:bg-[#960925] text-white font-serif font-bold tracking-widest text-xs uppercase py-3.5 transition-all duration-300 text-center rounded-none border border-black shadow-sm cursor-pointer"
               >
                 NEXT CHAPTER IN UGA
               </button>
 
-              <a
-                href="https://www.etsy.com/shop/notusualcreative"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full bg-white hover:bg-stone-100 text-stone-950 font-serif font-bold tracking-widest text-xs uppercase py-3.5 transition-all duration-300 text-center block rounded-none border border-black shadow-sm"
+              <button
+                onClick={handleShare}
+                className="w-full bg-white hover:bg-stone-100 text-stone-950 font-serif font-bold tracking-widest text-xs uppercase py-3.5 transition-all duration-300 text-center block rounded-none border border-black shadow-sm cursor-pointer"
               >
                 SHARE WITH THE UGA FAITHFUL
-              </a>
+              </button>
             </div>
           </div>
 
