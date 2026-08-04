@@ -7,7 +7,7 @@ export default function Home() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [shuffledIndices, setShuffledIndices] = useState<number[]>([]);
 
-  // 初始化：随机打乱 102 条内容的索引池（洗牌算法）
+  // 初始化：随机打乱内容索引池（洗牌算法）
   useEffect(() => {
     const indices = Array.from({ length: UGA_ARCHIVE_DATA.length }, (_, i) => i);
     for (let i = indices.length - 1; i > 0; i--) {
@@ -30,11 +30,11 @@ export default function Home() {
   const currentActualIndex = shuffledIndices[currentIndex];
   const currentItem: ArchiveItem = UGA_ARCHIVE_DATA[currentActualIndex];
 
-  // 智能提取当前事件的 4 位年份（若找不到则默认显示 1892）
+  // 智能提取当前事件的 4 位年份
   const yearMatch = currentItem.dateTag.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/) || currentItem.title.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/);
   const displayYear = yearMatch ? yearMatch[0] : "1892";
 
-  // 点击下一篇：在洗牌池中前进；102条播完后自动重新洗牌
+  // 点击下一篇：在洗牌池中前进；全部播完后自动重新洗牌
   const handleNext = () => {
     if (currentIndex < shuffledIndices.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -107,13 +107,10 @@ export default function Home() {
             {/* 压暗遮罩确保文字清晰 */}
             <div className="absolute inset-0 z-1 bg-black/15"></div>
 
-            {/* 内容区：动态展示当前事件的时间线标签与精准抽取的年份大数字 */}
+            {/* 内容区：去掉了所有计数统计，仅保留时间线标签与动态年份 */}
             <div className="relative z-10 flex flex-col items-center text-center px-4 space-y-1">
               <p className="tracking-[0.15em] uppercase text-[10px] sm:text-xs font-bold text-stone-900 bg-white/85 px-2 py-0.5 border border-stone-900">
                 {currentItem.dateTag}
-              </p>
-              <p className="tracking-[0.1em] uppercase text-[10px] sm:text-[11px] font-bold text-stone-900 bg-white/85 px-2 py-0.5 border border-stone-900">
-                CHRONICLE ENTRY ({currentIndex + 1} / 102)
               </p>
               <div className="transform -rotate-1 mt-1">
                 <span className="block tracking-tight text-[60px] sm:text-[85px] leading-none text-[#ba0c2f] vintage-number drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)]">
@@ -133,13 +130,13 @@ export default function Home() {
               &ldquo;{currentItem.narrative}&rdquo;
             </p>
 
-            {/* 翻页按钮：使用乔治亚红 */}
+            {/* 翻页按钮：去掉了数字后缀 */}
             <div className="space-y-3">
               <button
                 onClick={handleNext}
                 className="w-full bg-[#ba0c2f] hover:bg-[#960925] text-white font-serif font-bold tracking-widest text-xs uppercase py-3.5 transition-all duration-300 text-center rounded-none border border-black shadow-sm"
               >
-                NEXT CHAPTER IN UGA ({currentIndex + 1} / 102)
+                NEXT CHAPTER IN UGA
               </button>
 
               <a
