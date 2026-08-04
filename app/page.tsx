@@ -10,7 +10,6 @@ export default function Home() {
   // 初始化：随机打乱 102 条内容的索引池（洗牌算法）
   useEffect(() => {
     const indices = Array.from({ length: UGA_ARCHIVE_DATA.length }, (_, i) => i);
-    // Fisher-Yates 洗牌算法
     for (let i = indices.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [indices[i], indices[j]] = [indices[j], indices[i]];
@@ -25,19 +24,21 @@ export default function Home() {
   ];
   const randomBg = stadiumImages[Math.floor(Math.random() * stadiumImages.length)];
 
-  // 如果洗牌数组还没准备好，显示加载状态
   if (shuffledIndices.length === 0) return null;
 
   // 获取当前的档案项
   const currentActualIndex = shuffledIndices[currentIndex];
   const currentItem: ArchiveItem = UGA_ARCHIVE_DATA[currentActualIndex];
 
-  // 点击下一篇：在洗牌池中前进；如果 102 条播完，则重新洗牌开启新一轮
+  // 动态提取当前事件的 4 位年份（若找不到则默认显示 1892）
+  const yearMatch = currentItem.dateTag.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/) || currentItem.title.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/);
+  const displayYear = yearMatch ? yearMatch[0] : "1892";
+
+  // 点击下一篇：在洗牌池中前进；102条播完后自动重新洗牌
   const handleNext = () => {
     if (currentIndex < shuffledIndices.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      // 102条播完一轮，重新洗牌并回到开头
       const indices = Array.from({ length: UGA_ARCHIVE_DATA.length }, (_, i) => i);
       for (let i = indices.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -106,7 +107,7 @@ export default function Home() {
             {/* 压暗遮罩确保文字清晰 */}
             <div className="absolute inset-0 z-1 bg-black/15"></div>
 
-            {/* 内容区：移除了内部 ERA 等术语，换成时间线与大局观编号 */}
+            {/* 内容区：动态展示当前事件的时间线标签与精准抽取的年份大数字 */}
             <div className="relative z-10 flex flex-col items-center text-center px-4 space-y-1">
               <p className="tracking-[0.15em] uppercase text-[10px] sm:text-xs font-bold text-stone-900 bg-white/85 px-2 py-0.5 border border-stone-900">
                 {currentItem.dateTag}
@@ -115,14 +116,14 @@ export default function Home() {
                 CHRONICLE ENTRY ({currentIndex + 1} / 102)
               </p>
               <div className="transform -rotate-1 mt-1">
-                <span className="block tracking-tight text-[50px] sm:text-[70px] leading-none text-[#ba0c2f] vintage-number drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)]">
-                  UGA 1892
+                <span className="block tracking-tight text-[60px] sm:text-[85px] leading-none text-[#ba0c2f] vintage-number drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)]">
+                  {displayYear}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* 卡片下半部分：标题、正文与翻页按钮 */}
+          {/* 卡片下半部分：标题、完整正文与翻页按钮 */}
           <div className="p-6 sm:p-7 bg-white text-center">
             <h3 className="text-xl sm:text-2xl font-serif font-extrabold mb-3 leading-snug text-stone-950 tracking-tight">
               &ldquo;{currentItem.espnTitle}&rdquo;
@@ -132,7 +133,7 @@ export default function Home() {
               &ldquo;{currentItem.narrative}&rdquo;
             </p>
 
-            {/* 翻页按钮：全部采用乔治亚经典红配色 */}
+            {/* 翻页按钮：使用乔治亚红 */}
             <div className="space-y-3">
               <button
                 onClick={handleNext}
