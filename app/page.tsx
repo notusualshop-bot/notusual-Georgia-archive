@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { UGA_ARCHIVE_DATA, ArchiveItem } from "@/data/ugaArchive";
+import { UGA_ARCHIVE_DATA, ArchiveItem } from "@/data";
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<'ALL' | 'ERA' | 'LEG' | 'TRA' | 'RIV' | 'MOM'>('ALL');
